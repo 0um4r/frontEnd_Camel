@@ -1,0 +1,58 @@
+/* Signup.css */
+
+.container {
+    max-width: 400px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  
+  .app-title {
+    font-size: 18px;
+    margin: 0;
+    color: #4CAF50;
+    text-align: left;
+  }
+  
+  .form-group {
+    margin: 10px 0;
+    text-align: left;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input {
+    padding: 8px;
+    width: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  
+  .submit-button {
+    padding: 10px 15px;
+    background-color: #0b5f0d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 10px;
+  }
+  .submit-button:hover {
+    background-color: #1eb300;
+  }
+  
