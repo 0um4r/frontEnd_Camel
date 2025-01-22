@@ -6,6 +6,7 @@ import HomePage from './components/HomePage';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';   
 import Alerts from "./components/Alerts";
+import PredictionsPage from './components/PredictionsPage';
 
 function App() {
   const [isLogin, setIsLogin] = useState(true); // État pour basculer entre Login et Signup
@@ -24,6 +25,9 @@ function App() {
 
          {/* Route pour les Alerts */}
          <Route path="/Alerts" element={<Alerts />} />
+
+         {/* Route pour la page des prédictions */}
+         <Route path="/predictions" element={<PredictionsPage />} />
 
          {/* Route pour la page Login/Signup */}
          <Route

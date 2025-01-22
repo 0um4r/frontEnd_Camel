@@ -36,6 +36,7 @@ const HomePage = () => {
         <Link to="/dashboard" className="button">Tableau de bord</Link>
         <Link to="/settings" className="button">Paramètres</Link>
         <Link to="/alerts" className="button">Alertes</Link>
+        <Link to="/predictions" className="button">Prédictions</Link>
       </div>
     </div>
   );
