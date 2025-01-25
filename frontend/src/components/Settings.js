@@ -2,43 +2,68 @@ import React, { useState } from "react";
 import "./Settings.css";
 
 const Settings = () => {
-  const [airQuality, setAirQuality] = useState(50);
-  const [temperature, setTemperature] = useState(30);
-  const [humidity, setHumidity] = useState(70);
+  // États pour les seuils de température et d'humidité
+  const [seuilMaxTemp, setSeuilMaxTemp] = useState(30); // Seuil maximal de température par défaut
+  const [seuilMinTemp, setSeuilMinTemp] = useState(10); // Seuil minimal de température par défaut
+  const [seuilMaxHum, setSeuilMaxHum] = useState(70);   // Seuil maximal d'humidité par défaut
+  const [seuilMinHum, setSeuilMinHum] = useState(30);   // Seuil minimal d'humidité par défaut
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Paramètres enregistrés :\nQualité de l'air : ${airQuality}\nTempérature : ${temperature}°C\nHumidité : ${humidity}%`);
+    alert(
+      `Paramètres enregistrés :\n` +
+      `Seuil maximal de température : ${seuilMaxTemp}°C\n` +
+      `Seuil minimal de température : ${seuilMinTemp}°C\n` +
+      `Seuil maximal d'humidité : ${seuilMaxHum}%\n` +
+      `Seuil minimal d'humidité : ${seuilMinHum}%`
+    );
   };
 
   return (
     <div className="settings-container">
       <h1>Paramètres</h1>
       <form onSubmit={handleSubmit}>
+        {/* Champ pour le seuil maximal de température */}
         <label>
-          Seuil de qualité de l'air :
+          Seuil maximal de température (°C) :
           <input
             type="number"
-            value={airQuality}
-            onChange={(e) => setAirQuality(e.target.value)}
+            value={seuilMaxTemp}
+            onChange={(e) => setSeuilMaxTemp(parseFloat(e.target.value))}
           />
         </label>
+
+        {/* Champ pour le seuil minimal de température */}
         <label>
-          Seuil de température (°C) :
+          Seuil minimal de température (°C) :
           <input
             type="number"
-            value={temperature}
-            onChange={(e) => setTemperature(e.target.value)}
+            value={seuilMinTemp}
+            onChange={(e) => setSeuilMinTemp(parseFloat(e.target.value))}
           />
         </label>
+
+        {/* Champ pour le seuil maximal d'humidité */}
         <label>
-          Seuil d'humidité (%) :
+          Seuil maximal d'humidité (%) :
           <input
             type="number"
-            value={humidity}
-            onChange={(e) => setHumidity(e.target.value)}
+            value={seuilMaxHum}
+            onChange={(e) => setSeuilMaxHum(parseFloat(e.target.value))}
           />
         </label>
+
+        {/* Champ pour le seuil minimal d'humidité */}
+        <label>
+          Seuil minimal d'humidité (%) :
+          <input
+            type="number"
+            value={seuilMinHum}
+            onChange={(e) => setSeuilMinHum(parseFloat(e.target.value))}
+          />
+        </label>
+
+        {/* Bouton pour enregistrer les paramètres */}
         <button type="submit">Enregistrer les paramètres</button>
       </form>
     </div>
