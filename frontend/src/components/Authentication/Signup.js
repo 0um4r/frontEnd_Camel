@@ -1,14 +1,17 @@
-import React, { useState } from "react";
 import "./Signup.css"; // Importer le fichier CSS
-import logo from "./logo.jpeg";
+import logo from "../logo.jpeg";
+import { SignupUser } from "../services/userServices";
+import React, { useState } from "react";
+
 
 const Signup = ({ onSwitch }) => {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -16,42 +19,66 @@ const Signup = ({ onSwitch }) => {
       return;
     }
 
-    console.log("Signup data submitted:", { name, email, password });
-    // Appeler une API pour enregistrer les informations utilisateur
+    const user = {
+      firstname: firstName,
+      lastname: lastName,
+      email: email,
+      password: password,
+    };
+
+    try {
+      const response = await SignupUser(user);
+      console.log("User signed up successfully");
+    } catch (err) {
+      console.log("USER:", user);
+      console.error(err);
+      throw err;
+    }
   };
 
   return (
     <div className="container">
       {/* Logo et nom de l'application */}
       <div className="logo-container">
-    <img
-    src={logo} // Utilisez l'importation ici
-    alt="Logo"
-    style={{
-      width: "100px",
-      height: "80px",
-      marginRight: "30px",
-    }}
-    />
-    <h1
-      style={{
-        fontSize: "18px",
-        margin: "0",
-        color: "#4CAF50",
-      }}
-    ><em>
-      Système de Surveillance <br /> Environnementale
-       </em></h1>
+        <img
+          src={logo} // Utilisez l'importation ici
+          alt="Logo"
+          style={{
+            width: "100px",
+            height: "80px",
+            marginRight: "30px",
+          }}
+        />
+        <h1
+          style={{
+            fontSize: "18px",
+            margin: "0",
+            color: "#4CAF50",
+          }}
+        >
+          <em>
+            Système de Surveillance <br /> Environnementale
+          </em>
+        </h1>
       </div>
 
       {/* Formulaire d'inscription */}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Nom complet </label>
+          <label>Prenom</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label>Nom</label>
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             required
           />
         </div>
@@ -87,9 +114,9 @@ const Signup = ({ onSwitch }) => {
         </button>
       </form>
       <p style={{ marginTop: "20px" }}>
-        Déjà un compte ?{" "}
+        Avez vous déjà un compte ?{" "}
         <button
-          onClick={ onSwitch }
+          onClick={onSwitch}
           style={{
             border: "none",
             background: "none",
