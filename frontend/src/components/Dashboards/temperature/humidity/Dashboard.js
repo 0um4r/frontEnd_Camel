@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
+import { Link } from "react-router-dom";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,6 +14,8 @@ import {
 import { fetchhumidityData } from "../../../services/HumidityService";
 import { fetchTempData } from "../../../services/TempDataService";
 import { Spinner } from "../../../effects/LoadingSpinner";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';
 import "./Dashboard.css";
 
 ChartJS.register(
@@ -43,16 +46,16 @@ const Dashboard = () => {
         const humidityTimestamps = humidityData.map(
           (d) => d.date_registrationDate
         );
-        const humidityLocs = humidityData.map((d) => d.location); // Assuming each data point has a location
+        const humidityLocs = humidityData.map((d) => d.location);
 
         const temperatureValues = temperatureData.map((d) => d.data);
         const temperatureTimestamps = temperatureData.map(
           (d) => d.date_registrationDate
         );
-        const temperatureLocs = temperatureData.map((d) => d.location); // Assuming each data point has a location
+        const temperatureLocs = temperatureData.map((d) => d.location);
 
         setHumidities(humidityValues);
-        setTimestamps(humidityTimestamps); // Assuming both datasets have the same timestamps
+        setTimestamps(humidityTimestamps);
         setTemperature(temperatureValues);
         setHumidityLocations(humidityLocs);
         setTemperatureLocations(temperatureLocs);
@@ -102,22 +105,63 @@ const Dashboard = () => {
       },
       title: {
         display: true,
-        text: "Valeurs de surveillance.",
+        text: "Valeurs de surveillance",
       },
     },
   };
 
   return (
-    <section className="dashboard-container">
-      <h1>Tableau de bord</h1>
-      <div className="charts-container">
-        <section className="chart-wrapper">
-          <div className="chart">
-            <h2>Dashboard de Température</h2>
+    <div className="dashboard-page">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <ul>
+          <li>
+                                <Link to="/home">
+                                  <FontAwesomeIcon icon={faTachometerAlt} /> HomePage
+                                </Link>
+          </li>
+          <li>
+            <Link to="/dashboard">
+              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
+            </Link>
+          </li>
+          <li>
+            <Link to="/profile">
+              <FontAwesomeIcon icon={faUser} /> Profil
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings">
+              <FontAwesomeIcon icon={faCog} /> Paramètres
+            </Link>
+          </li>
+          
+          <li>
+            <Link to="/predictions">
+              <FontAwesomeIcon icon={faChartLine} /> Prédictions
+            </Link>
+          </li>
+          <li>
+            <Link to="/server">
+              <FontAwesomeIcon icon={faServer} /> Serveur
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      {/* Contenu principal */}
+      <section className="dashboard-container">
+        <h1>Tableau de bord</h1>
+        <div className="grid-container">
+          {/* Température - Graphique */}
+          <div className="grid-item">
+            <h2>Température</h2>
             <Line data={temperatureData} options={options} />
           </div>
-          <div className="data-container">
-            <h3>Données de Température</h3>
+
+          {/* Données de Température - Tableau */}
+          <div className="grid-item">
+            <h2>Données de Température</h2>
             <table>
               <thead>
                 <tr>
@@ -137,15 +181,16 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
-        </section>
 
-        <section className="chart-wrapper">
-          <div className="chart">
-            <h2>Dashboard de Humidité</h2>
+          {/* Humidité - Graphique */}
+          <div className="grid-item">
+            <h2>Humidité</h2>
             <Line data={humidityData} options={options} />
           </div>
-          <div className="data-container">
-            <h3>Données d'Humidité</h3>
+
+          {/* Données d'Humidité - Tableau */}
+          <div className="grid-item">
+            <h2>Données d'Humidité</h2>
             <table>
               <thead>
                 <tr>
@@ -165,9 +210,9 @@ const Dashboard = () => {
               </tbody>
             </table>
           </div>
-        </section>
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
   );
 };
 

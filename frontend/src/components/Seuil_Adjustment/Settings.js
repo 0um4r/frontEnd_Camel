@@ -1,4 +1,19 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faCog,           // Icône des paramètres
+  faExchangeAlt,    // Icône de changement de broker
+  faThermometerHalf,// Icône de température
+  faTint,           // Icône d'humidité
+  faSave,           // Icône de sauvegarde
+  faTachometerAlt,  // Icône du tableau de bord
+  faUser,           // Icône du profil
+  faBell,           // Icône des alertes
+  faChartLine,      // Icône des prédictions
+  faServer,          // Icône du serveur
+  faHome
+} from '@fortawesome/free-solid-svg-icons';
 import "./Settings.css";
 
 const Settings = () => {
@@ -20,52 +35,112 @@ const Settings = () => {
   };
 
   return (
-    <div className="settings-container">
-      <h1>Paramètres</h1>
-      <form onSubmit={handleSubmit}>
-        {/* Champ pour le seuil maximal de température */}
-        <label>
-          Seuil maximal de température (°C) :
-          <input
-            type="number"
-            value={seuilMaxTemp}
-            onChange={(e) => setSeuilMaxTemp(parseFloat(e.target.value))}
-          />
-        </label>
+    <div className="settings-page">
+      {/* Sidebar */}
+      <div className="sidebar">
+        <ul>
+          <li>
+            <Link to="/home">
+              <FontAwesomeIcon icon={faHome} /> HomePage
+            </Link>
+          </li>
+          <li>
+            <Link to="/dashboard">
+              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
+            </Link>
+          </li>
+          <li>
+            <Link to="/profile">
+              <FontAwesomeIcon icon={faUser} /> Profil
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings">
+              <FontAwesomeIcon icon={faCog} /> Paramètres
+            </Link>
+          </li>
+          
+          <li>
+            <Link to="/predictions">
+              <FontAwesomeIcon icon={faChartLine} /> Prédictions
+            </Link>
+          </li>
+          <li>
+            <Link to="/server">
+              <FontAwesomeIcon icon={faServer} /> Serveur
+            </Link>
+          </li>
+        </ul>
+      </div>
 
-        {/* Champ pour le seuil minimal de température */}
-        <label>
-          Seuil minimal de température (°C) :
-          <input
-            type="number"
-            value={seuilMinTemp}
-            onChange={(e) => setSeuilMinTemp(parseFloat(e.target.value))}
-          />
-        </label>
+      {/* Contenu principal */}
+      <div className="settings-container">
+        <h1><FontAwesomeIcon icon={faCog} /> Paramètres</h1>
 
-        {/* Champ pour le seuil maximal d'humidité */}
-        <label>
-          Seuil maximal d'humidité (%) :
-          <input
-            type="number"
-            value={seuilMaxHum}
-            onChange={(e) => setSeuilMaxHum(parseFloat(e.target.value))}
-          />
-        </label>
+        {/* Formulaire pour les seuils */}
+        <form onSubmit={handleSubmit} className="settings-form">
+          <div className="form-group">
+            <label>
+              <FontAwesomeIcon icon={faThermometerHalf} /> Seuil maximal de température (°C) :
+            </label>
+            <input
+              type="number"
+              value={seuilMaxTemp}
+              onChange={(e) => setSeuilMaxTemp(parseFloat(e.target.value))}
+              className="input-field"
+            />
+          </div>
 
-        {/* Champ pour le seuil minimal d'humidité */}
-        <label>
-          Seuil minimal d'humidité (%) :
-          <input
-            type="number"
-            value={seuilMinHum}
-            onChange={(e) => setSeuilMinHum(parseFloat(e.target.value))}
-          />
-        </label>
+          <div className="form-group">
+            <label>
+              <FontAwesomeIcon icon={faThermometerHalf} /> Seuil minimal de température (°C) :
+            </label>
+            <input
+              type="number"
+              value={seuilMinTemp}
+              onChange={(e) => setSeuilMinTemp(parseFloat(e.target.value))}
+              className="input-field"
+            />
+          </div>
 
-        {/* Bouton pour enregistrer les paramètres */}
-        <button type="submit">Enregistrer les paramètres</button>
-      </form>
+          <div className="form-group">
+            <label>
+              <FontAwesomeIcon icon={faTint} /> Seuil maximal d'humidité (%) :
+            </label>
+            <input
+              type="number"
+              value={seuilMaxHum}
+              onChange={(e) => setSeuilMaxHum(parseFloat(e.target.value))}
+              className="input-field"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>
+              <FontAwesomeIcon icon={faTint} /> Seuil minimal d'humidité (%) :
+            </label>
+            <input
+              type="number"
+              value={seuilMinHum}
+              onChange={(e) => setSeuilMinHum(parseFloat(e.target.value))}
+              className="input-field"
+            />
+          </div>
+
+          <button type="submit" className="save-button">
+            <FontAwesomeIcon icon={faSave} /> Enregistrer les paramètres
+          </button>
+        </form>
+
+        {/* Lien "Change Broker" */}
+        <div className="broker-link">
+          <Link to="/broker-settings">
+            <FontAwesomeIcon icon={faExchangeAlt} /> Change Broker
+          </Link>
+        </div>
+      </div>
+
+      
     </div>
   );
 };

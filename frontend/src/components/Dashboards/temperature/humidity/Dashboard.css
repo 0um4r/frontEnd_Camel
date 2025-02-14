@@ -1,33 +1,86 @@
-.dashboard-container {
+/* Structure de la page */
+.dashboard-page {
   display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 200px;
+  background-color: #2c3e50;
+  padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  margin: 20px 0;
+}
+
+.sidebar ul li a {
+  text-decoration: none;
+  color: #ecf0f1;
+  display: flex;
   align-items: center;
+  font-size: 14px;
+  transition: color 0.3s ease;
 }
 
-.charts-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
+.sidebar ul li a:hover {
+  color: #3498db;
 }
 
-.chart-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+.sidebar ul li a svg {
+  margin-right: 10px;
+  width: 16px;
+}
+
+/* Contenu principal */
+.dashboard-container {
+  flex-grow: 1;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.dashboard-container h1 {
+  text-align: center;
+  color: #2c3e50;
   margin-bottom: 20px;
-  width: 100%;
+  font-size: 24px;
 }
 
-.chart,
-.data-container {
-  flex: 1;
-  min-width: 300px; /* Ensures both have a reasonable minimum width */
+/* Grille pour les 4 sections */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colonnes */
+  grid-template-rows: repeat(2, 1fr); /* 2 lignes */
+  gap: 20px;
+  height: calc(100vh - 100px); /* Ajuster la hauteur pour éviter le défilement */
 }
 
-.data-container {
-  margin-left: 20px;
+/* Chaque section de la grille */
+.grid-item {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Empêche le débordement du contenu */
 }
 
+/* Graphique */
+.grid-item h2 {
+  font-size: 18px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+/* Tableau */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -37,8 +90,18 @@ th,
 td {
   border: 1px solid #ddd;
   padding: 8px;
+  text-align: left;
 }
 
 th {
   background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
 }

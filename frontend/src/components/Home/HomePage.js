@@ -1,10 +1,13 @@
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';
 import "./HomePage.css";
 import { Spinner } from "../effects/LoadingSpinner";
 import { fetchLatestHumidityData } from "../services/HumidityService";
 import { fetchLatestTemperatureData } from "../services/TempDataService";
 import CombinedChart from "../Dashboards/combinedDashbord";
+
 const HomePage = () => {
   const [latestTemp, setLatestTemp] = useState("");
   const [latestHum, setLatestHum] = useState("");
@@ -32,44 +35,70 @@ const HomePage = () => {
 
   return (
     <div className="home-container">
-      <header className="header">
-        <h1>Bienvenue sur le Système de Surveillance Environnementale 🌍</h1>
-        <p>
-          Protégeons l'environnement avec des données précises et en temps réel.
-        </p>
-      </header>
+      {/* Sidebar */}
+      <div className="sidebar">
+        <ul>
 
-      <div className="summary-section">
-        <div className="summary-card">
-          <h3>Température</h3>
-          <p>🌡{latestTemp.data}C°</p>
-        </div>
-        <div className="summary-card">
-          <h3>Humidité</h3>
-          <p>💧 {latestHum.data}%</p>
-        </div>
+          <li>
+                                <Link to="/home">
+                                  <FontAwesomeIcon icon={faTachometerAlt} /> HomePage
+                                </Link>
+          </li>
+          <li>
+            <Link to="/dashboard">
+              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
+            </Link>
+          </li>
+          <li>
+            <Link to="/profile">
+              <FontAwesomeIcon icon={faUser} /> Profil
+            </Link>
+          </li>
+          <li>
+            <Link to="/settings">
+              <FontAwesomeIcon icon={faCog} /> Paramètres
+            </Link>
+          </li>
+          
+          <li>
+            <Link to="/predictions">
+              <FontAwesomeIcon icon={faChartLine} /> Prédictions
+            </Link>
+          </li>
+          <li>
+            <Link to="/server">
+              <FontAwesomeIcon icon={faServer} /> Serveur
+            </Link>
+          </li>
+        </ul>
       </div>
 
-      <div className="graph-section">
-        <h2>Données en temps réel</h2>
-        <div className="graph-placeholder">
-          <CombinedChart />
-        </div>
-      </div>
+      {/* Main Content */}
+      <div className="main-content">
+        <header className="header">
+          <h1>Bienvenue sur le Système de Surveillance Environnementale 🌍</h1>
+          <p>
+            Protégeons l'environnement avec des données précises et en temps réel.
+          </p>
+        </header>
 
-      <div className="button-group">
-        <Link to="/dashboard" className="button">
-          Tableaux de bord
-        </Link>
-        <Link to="/settings" className="button">
-          Paramètres
-        </Link>
-        <Link to="/alerts" className="button">
-          Alertes
-        </Link>
-        <Link to="/predictions" className="button">
-          Prédictions
-        </Link>
+        <div className="summary-section">
+          <div className="summary-card">
+            <h3>Température</h3>
+            <p>🌡{latestTemp.data}C°</p>
+          </div>
+          <div className="summary-card">
+            <h3>Humidité</h3>
+            <p>💧 {latestHum.data}%</p>
+          </div>
+        </div>
+
+        <div className="graph-section">
+          <h2>Données en temps réel</h2>
+          <div className="graph-placeholder">
+            <CombinedChart />
+          </div>
+        </div>
       </div>
     </div>
   );

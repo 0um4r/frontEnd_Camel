@@ -1,0 +1,153 @@
+/* Structure de la page */
+.profile-page {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f9f9f9;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 200px; /* Réduit la largeur */
+    background-color: #2c3e50;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar ul li {
+    margin: 20px 0;
+  }
+  
+  .sidebar ul li a {
+    text-decoration: none;
+    color: #ecf0f1;
+    display: flex;
+    align-items: center;
+    font-size: 14px; /* Taille de police réduite */
+    transition: color 0.3s ease;
+  }
+  
+  .sidebar ul li a:hover {
+    color: #3498db;
+  }
+  
+  .sidebar ul li a svg {
+    margin-right: 10px;
+    width: 16px; /* Taille des icônes réduite */
+  }
+  
+  /* Contenu principal */
+  .profile-container {
+    flex-grow: 1;
+    padding: 20px;
+    background-color: #fff;
+    max-width: 500px; /* Réduit la largeur du contenu */
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Titre */
+  .profile-container h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  
+  /* Formulaire de changement de mot de passe */
+  .password-form {
+    margin-bottom: 20px;
+  }
+  
+  .password-form h2 {
+    font-size: 18px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .password-form h2 svg {
+    color: #3498db;
+  }
+  
+  /* Groupes de formulaire */
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 14px;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+  }
+  
+  .form-group input:focus {
+    border-color: #3498db;
+  }
+  
+  /* Boutons */
+  .change-password-button,
+  .logout-button {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .change-password-button {
+    background-color: #146d93; /* Nouvelle couleur verte */
+    color: #fff;
+  }
+  
+  .change-password-button:hover {
+    background-color: #146d93; /* Vert plus foncé au survol */
+  }
+  
+  .logout-button {
+    background-color: #c42a08; /* Nouvelle couleur orange */
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .logout-button:hover {
+    background-color: #d35400; /* Orange plus foncé au survol */
+  }
+  
+  /* Messages d'erreur et de succès */
+  .error-message {
+    color: #af3a2c;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  
+  .success-message {
+    color: #2e82cc;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
