@@ -4,25 +4,6 @@ const BASE_URL = "http://localhost:8080/api/users";
 
 const token = Cookies.get("token");
 
-export const SignupUser = async (User) => {
-  try {
-    const response = await fetch(`${BASE_URL}/auth/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(User),
-    });
-    if (!response.ok) {
-      throw new Error("Response isn't okay");
-    }
-    return await response.json();
-  } catch (err) {
-    console.error("Error could not connect to API", err);
-    throw err;
-  }
-};
-
 export const SigninUser = async (Credentials) => {
   /*This normally returns a token*/
 
@@ -122,6 +103,29 @@ export const updateUser = async (id, newVersion) => {
     throw err;
   }
 };
+
+
+export const createUser = async (User) =>
+{
+
+  try {
+    const response = await fetch(`${BASE_URL}/users/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(User),
+    });
+    if (!response.ok) {
+      throw new Error("Response isn't okay");
+    }
+    return await response.json();
+  } catch (err) {
+    console.error("Error could not connect to API", err);
+    throw err;
+  }
+
+}
 
 export const deletUser = async (id) => {
   try {

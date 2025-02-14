@@ -6,6 +6,7 @@ import "./CreateUser.css";
 import { Link } from "react-router-dom";
 
 import { faTachometerAlt, faCog,  faChartLine, faServer, faUser } from '@fortawesome/free-solid-svg-icons';
+import { createUser } from "../../services/userServices";
 
 
 
@@ -15,11 +16,11 @@ const CreateUser = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("user");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
     // Validation des champs
@@ -27,14 +28,29 @@ const CreateUser = () => {
       setError("Tous les champs sont obligatoires.");
       return;
     }
+    if (password !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas !");
+      return;
+    }
 
-    // Simuler une requête API pour créer un utilisateur
-    setError("");
-    setSuccess("Utilisateur créé avec succès !");
-    setTimeout(() => {
-      setSuccess("");
-      navigate("/profile"); // Rediriger vers la page de profil après la création
-    }, 3000);
+    const user = {
+          firstname: firstName,
+          lastname: lastName,
+          email: email,
+          role:role,
+          password: password,
+        };
+
+        try {
+          const response = await createUser(user);
+          console.log("User created successfully");
+        } catch (err) {
+          console.log("USER:", user);
+          console.error(err);
+          throw err;
+        }
+
+
   };
 
   return (
@@ -122,6 +138,16 @@ const CreateUser = () => {
               required
             />
           </div>
+          <div className="form-group">
+            <label>Confirmer le mot de passe</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
 
           <div className="form-group">
             <label>Rôle</label>

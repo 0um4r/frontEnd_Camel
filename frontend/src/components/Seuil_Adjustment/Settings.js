@@ -15,23 +15,40 @@ import {
   faHome
 } from '@fortawesome/free-solid-svg-icons';
 import "./Settings.css";
+import { setSeuil } from "../../services/seuilSequenceService";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
   // États pour les seuils de température et d'humidité
-  const [seuilMaxTemp, setSeuilMaxTemp] = useState(30); // Seuil maximal de température par défaut
-  const [seuilMinTemp, setSeuilMinTemp] = useState(10); // Seuil minimal de température par défaut
-  const [seuilMaxHum, setSeuilMaxHum] = useState(70);   // Seuil maximal d'humidité par défaut
-  const [seuilMinHum, setSeuilMinHum] = useState(30);   // Seuil minimal d'humidité par défaut
+  const [seuilMaxTemp, setSeuilMaxTemp] = useState(); // Seuil maximal de température par défaut
+  const [seuilMinTemp, setSeuilMinTemp] = useState(); // Seuil minimal de température par défaut
+  const [seuilMaxHum, setSeuilMaxHum] = useState();   // Seuil maximal d'humidité par défaut
+  const [seuilMinHum, setSeuilMinHum] = useState();   // Seuil minimal d'humidité par défaut
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(
-      `Paramètres enregistrés :\n` +
-      `Seuil maximal de température : ${seuilMaxTemp}°C\n` +
-      `Seuil minimal de température : ${seuilMinTemp}°C\n` +
-      `Seuil maximal d'humidité : ${seuilMaxHum}%\n` +
-      `Seuil minimal d'humidité : ${seuilMinHum}%`
-    );
+    
+
+    const seuilSequence = {
+      seuil_min_temp : seuilMinTemp,
+      seuil_max_temp : seuilMaxTemp,
+      seuil_min_hum  : seuilMinHum,
+      seuil_max_hum  : seuilMaxHum
+
+    };
+
+    try{
+    const response = await setSeuil(seuilSequence);
+    console.log("Threshold sequence switched");
+    navigate("/home")
+  }catch(err)
+    {
+      console.error("Erro-->",e);
+    }
+
   };
 
   return (
@@ -86,7 +103,7 @@ const Settings = () => {
             <input
               type="number"
               value={seuilMaxTemp}
-              onChange={(e) => setSeuilMaxTemp(parseFloat(e.target.value))}
+              onChange={(e) => setSeuilMaxTemp(e.target.value)}
               className="input-field"
             />
           </div>
@@ -98,7 +115,7 @@ const Settings = () => {
             <input
               type="number"
               value={seuilMinTemp}
-              onChange={(e) => setSeuilMinTemp(parseFloat(e.target.value))}
+              onChange={(e) => setSeuilMinTemp(e.target.value)}
               className="input-field"
             />
           </div>
@@ -110,7 +127,7 @@ const Settings = () => {
             <input
               type="number"
               value={seuilMaxHum}
-              onChange={(e) => setSeuilMaxHum(parseFloat(e.target.value))}
+              onChange={(e) => setSeuilMaxHum(e.target.value)}
               className="input-field"
             />
           </div>

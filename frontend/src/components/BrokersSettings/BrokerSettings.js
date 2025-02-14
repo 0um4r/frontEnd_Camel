@@ -6,24 +6,65 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { BrokerContext } from "./BrokerContext"; // Import du contexte
 import "./BrokerSettings.css";
+import { fetchBrokers } from "../../services/brokerService";
+import { Spinner } from "../effects/LoadingSpinner";
 
 const BrokerSettings = () => {
-  const { addBroker } = useContext(BrokerContext); // Utilisation du contexte
+
   const [showAddBrokerForm, setShowAddBrokerForm] = useState(false);
-  const [newBroker, setNewBroker] = useState({ ip: "", port: "" });
-  const { brokers } = useContext(BrokerContext); // Accéder à brokers via le contexte
+  const {ip,setIp} = useState();
+  const {port,setPort} = useState();
+  const { brokers ,setBrokers} = useState([]); // Accéder à brokers via le contexte
+  const {loading,setLoading} = useState();
+  const {error,setError} = useState();
+
 
   const handleAddBrokerClick = () => {
     setShowAddBrokerForm(true);
   };
 
-  const handleAddBrokerSubmit = (e) => {
+
+useEffect(() => {
+    const loadData = async () => {
+      try {
+        
+        const data = await fetchBrokers();
+        setBrokers(brokers);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+        setError(error);
+      }
+    };
+
+    loadData();
+  }, []);
+
+
+  
+  if (loading) return <Spinner/>
+
+  const handleAddBrokerSubmit = async (e) => {
     e.preventDefault();
-    if (newBroker.ip && newBroker.port) {
-      addBroker({ id: Date.now(), ...newBroker }); // Ajout du broker via le contexte
-      setNewBroker({ ip: "", port: "" });
-      setShowAddBrokerForm(false);
+    
+
+    const broker_ = {
+      ip:ip,
+      port:port
+    };
+
+
+    try {
+
+      const response =  await cb(broker_.ip,broker_.port);
+      console.log("Changed the broker");
+    }catch(err)
+    {
+      throw err;
     }
+
+    
   };
 
   return (
@@ -74,8 +115,8 @@ const BrokerSettings = () => {
             <h2>Sélectionner un Broker</h2>
             <select>
               {brokers.map((broker) => (
-                <option key={broker.id} value={broker.id}>
-                  {broker.ip}:{broker.port}
+                <option key={broker.id} value={broker.ip+":"+broker.port}>
+                  {broker.ip}
                 </option>
               ))}
             </select>
@@ -98,8 +139,8 @@ const BrokerSettings = () => {
                   <label>Adresse IP :</label>
                   <input
                     type="text"
-                    value={newBroker.ip}
-                    onChange={(e) => setNewBroker({ ...newBroker, ip: e.target.value })}
+                    value={ip}
+                    onChange={(e) => setIp(e.target.value)}
                     required
                   />
                 </div>
@@ -107,8 +148,8 @@ const BrokerSettings = () => {
                   <label>Numéro de port :</label>
                   <input
                     type="text"
-                    value={newBroker.port}
-                    onChange={(e) => setNewBroker({ ...newBroker, port: e.target.value })}
+                    value={port}
+                    onChange={(e) => setPort(e.target.value)}
                     required
                   />
                 </div>
