@@ -14,7 +14,7 @@ export const fetchhumidityData = async () => {
       },
     });
     if (!response.ok)
-      throw Error("Response is not ok while fetching humidityData");
+      console.log("Fetching humidities ",response.status);
     return response.json();
   } catch (err) {
     console.error("Could not connect to API ", err);
@@ -32,7 +32,7 @@ export const fetchLatestHumidityData = async () => {
       },
     });
     if (!response.ok)
-      throw Error("Response is not Ok while fecthing data humdity");
+      console.log("Response latest hum status ", response.status);
     return response.json();
   } catch (err) {
     throw err;

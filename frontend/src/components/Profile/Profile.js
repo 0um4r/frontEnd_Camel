@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faKey, faSignOutAlt, faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer, faUserPlus, faHome } from '@fortawesome/free-solid-svg-icons';
 import "./Profile.css";
 import handleCreateUserClick from "../UserManagement/CreateUser";
-
+import Cookies from "js-cookie";
+import {logoutUser} from "../../services/userServices";
 const Profile = () => {
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -40,10 +41,13 @@ const Profile = () => {
     setConfirmPassword("");
   };
 
-  const handleLogout = () => {
-    // Simuler une déconnexion
-    localStorage.removeItem("token"); // Supprimer le token d'authentification
-    navigate("/login"); // Rediriger vers la page de connexion
+  const handleLogout = async () => {
+    // Simuler une déconne
+  
+  
+    Cookies.remove("token");
+     // Supprimer le token d'authentification
+    navigate("/"); // Rediriger vers la page de connexion
   };
 
   return (

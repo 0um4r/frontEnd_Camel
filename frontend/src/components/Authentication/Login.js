@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Login.css"; // Assurez-vous de créer un fichier CSS pour le style
 import logo from "../logo.jpeg";
-import { SigninUser } from "../services/userServices";
+import { SigninUser } from "../../services/userServices";
 import { useNavigate } from "react-router-dom";
 import Cookies from 'js-cookie'
 
@@ -24,6 +24,7 @@ function Login({ onSwitch }) {
       if (response != null) {
         token = response["token"];
         Cookies.set("token", token);
+        console.log("Token is: ", token);
         navigate("/home");
       } else return;
 

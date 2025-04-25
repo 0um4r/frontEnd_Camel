@@ -13,7 +13,7 @@ export const fetchTempData = async () => {
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok) throw Error("Response is not ok while fetching TempData");
+    if (!response.ok) throw Error("Response is not ok while fetching TempData status",response.status);
     return response.json();
   } catch (err) {
     console.error("Could not connect to API ", err);
@@ -31,8 +31,8 @@ export const fetchLatestTemperatureData = async () => {
       },
     });
     if (!response.ok)
-      throw Error("Response is not Ok while fecthing data temperature");
-    return response.json();
+        console.log("Response latest temp status is ",response.status);
+      return response.json();
   } catch (err) {
     throw err;
   }

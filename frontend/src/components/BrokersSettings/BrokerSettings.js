@@ -1,71 +1,69 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faServer, faPlus, faCheck, faTachometerAlt, faUser, faCog, faBell, faChartLine
-} from '@fortawesome/free-solid-svg-icons';
-import { BrokerContext } from "./BrokerContext"; // Import du contexte
+  faServer,
+  faPlus,
+  faCheck,
+  faTachometerAlt,
+  faUser,
+  faCog,
+  faBell,
+  faChartLine,
+  faEnvelopeOpenText
+} from "@fortawesome/free-solid-svg-icons";
 import "./BrokerSettings.css";
-import { fetchBrokers } from "../../services/brokerService";
+import { fetchBrokers, cb } from "../../services/brokerService";
 import { Spinner } from "../effects/LoadingSpinner";
+import Subscribe from "./Subscribe"
 
 const BrokerSettings = () => {
-
   const [showAddBrokerForm, setShowAddBrokerForm] = useState(false);
-  const {ip,setIp} = useState();
-  const {port,setPort} = useState();
-  const { brokers ,setBrokers} = useState([]); // Accéder à brokers via le contexte
-  const {loading,setLoading} = useState();
-  const {error,setError} = useState();
-
+  const [showSubscribeForm, setShowSubscribeForm] = useState(false); // 👈 New state
+  const [ip, setIp] = useState("");
+  const [port, setPort] = useState("");
+  const [brokers, setBrokers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleAddBrokerClick = () => {
     setShowAddBrokerForm(true);
   };
 
+  const handleSubscribeClick = () => {
+    setShowSubscribeForm(true); // 👈 Open the subscribe form
+  };
 
-useEffect(() => {
+  const handleCloseSubscribe = () => {
+    setShowSubscribeForm(false); // 👈 Close the subscribe form
+  };
+
+  useEffect(() => {
     const loadData = async () => {
       try {
-        
         const data = await fetchBrokers();
-        setBrokers(brokers);
-        setLoading(false);
+        setBrokers(data);
+        console.log("Fetched brokers", data);
       } catch (err) {
         console.error(err);
+      } finally {
         setLoading(false);
-        setError(error);
       }
     };
 
     loadData();
   }, []);
 
-
-  
-  if (loading) return <Spinner/>
-
   const handleAddBrokerSubmit = async (e) => {
     e.preventDefault();
-    
-
-    const broker_ = {
-      ip:ip,
-      port:port
-    };
-
-
     try {
-
-      const response =  await cb(broker_.ip,broker_.port);
-      console.log("Changed the broker");
-    }catch(err)
-    {
-      throw err;
+      const response = await cb(ip, port);
+      console.log("Changed the broker", response);
+    } catch (err) {
+      console.error("Failed to change broker", err);
     }
-
-    
   };
+
+  if (loading) return <Spinner />;
 
   return (
     <div className="broker-settings-page">
@@ -107,7 +105,9 @@ useEffect(() => {
 
       {/* Contenu principal */}
       <div className="broker-settings-container">
-        <h1><FontAwesomeIcon icon={faServer} /> Paramètres du Broker</h1>
+        <h1>
+          <FontAwesomeIcon icon={faServer} /> Paramètres du Broker
+        </h1>
 
         <div className="broker-settings-content">
           {/* Partie gauche : Sélection de broker */}
@@ -115,7 +115,7 @@ useEffect(() => {
             <h2>Sélectionner un Broker</h2>
             <select>
               {brokers.map((broker) => (
-                <option key={broker.id} value={broker.ip+":"+broker.port}>
+                <option key={broker.id} value={broker.ip + ":" + broker.port}>
                   {broker.ip}
                 </option>
               ))}
@@ -126,6 +126,9 @@ useEffect(() => {
               </button>
               <button className="add-button" onClick={handleAddBrokerClick}>
                 <FontAwesomeIcon icon={faPlus} /> Ajouter un nouveau broker
+              </button>
+              <button className="add-button" onClick={handleSubscribeClick}>
+                <FontAwesomeIcon icon={faEnvelopeOpenText} /> S'abonner à un topic
               </button>
             </div>
           </div>
@@ -159,10 +162,11 @@ useEffect(() => {
               </form>
             </div>
           )}
+
+          {/* 🎯 Subscribe popup form */}
+          {showSubscribeForm && <Subscribe onClose={handleCloseSubscribe} />}
         </div>
       </div>
-
-    
     </div>
   );
 };

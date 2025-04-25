@@ -1,12 +1,12 @@
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faUser, faCog, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';
 import "./HomePage.css";
 import { Spinner } from "../effects/LoadingSpinner";
-import { fetchLatestHumidityData } from "../services/HumidityService";
-import { fetchLatestTemperatureData } from "../services/TempDataService";
-import CombinedChart from "../Dashboards/combinedDashbord";
+import { fetchLatestHumidityData } from "../../services/HumidityService"; 
+import { fetchLatestTemperatureData } from "../../services/TempDataService";
+import DroneEvolution from "../Dashboards/droneEvolution";
 
 const HomePage = () => {
   const [latestTemp, setLatestTemp] = useState("");
@@ -96,7 +96,7 @@ const HomePage = () => {
         <div className="graph-section">
           <h2>Données en temps réel</h2>
           <div className="graph-placeholder">
-            <CombinedChart />
+            <DroneEvolution />
           </div>
         </div>
       </div>

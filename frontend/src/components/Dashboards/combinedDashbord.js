@@ -10,8 +10,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { fetchhumidityData } from "../services/HumidityService";
-import { fetchTempData } from "../services/TempDataService";
+import { fetchhumidityData } from "../../services/HumidityService";
+import { fetchTempData } from "../../services/TempDataService";
 
 ChartJS.register(
   CategoryScale,

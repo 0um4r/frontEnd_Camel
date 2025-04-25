@@ -11,8 +11,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { fetchhumidityData } from "../../../services/HumidityService";
-import { fetchTempData } from "../../../services/TempDataService";
+import { fetchhumidityData } from "../../../../services/HumidityService";
+import { fetchTempData } from "../../../../services/TempDataService";
 import { Spinner } from "../../../effects/LoadingSpinner";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';

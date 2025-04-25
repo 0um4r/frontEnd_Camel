@@ -19,6 +19,7 @@ const CreateUser = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async(e) => {
     e.preventDefault();
@@ -43,7 +44,10 @@ const CreateUser = () => {
 
         try {
           const response = await createUser(user);
-          console.log("User created successfully");
+          if(response.ok){
+            setSuccess("Success");
+        }
+          console.log("User created successfully , ",response);
         } catch (err) {
           console.log("USER:", user);
           console.error(err);

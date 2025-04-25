@@ -143,4 +143,22 @@ export const deletUser = async (id) => {
     console.error("Could not connect to API", err);
     throw err;
   }
-};
+}
+
+  export const logoutUser = async (id) => {
+    try {
+      const response = await fetch(`${BASE_URL}/users/disconnect/${id}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          "Content-Type": "application/json",
+        },
+    })
+    if (!response.ok) throw Error("Response is not ok while Logging out user");
+}
+catch (err) {
+    console.error("Could not connect to API", err);
+    throw err;
+  }
+}
+  
