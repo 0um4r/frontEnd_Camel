@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faUser, faCog, faChartLine, faServer } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faUser, faCog, faChartLine, faServer,faHome } from '@fortawesome/free-solid-svg-icons';
 import "./HomePage.css";
 import { Spinner } from "../effects/LoadingSpinner";
 import { fetchLatestHumidityData } from "../../services/HumidityService"; 
@@ -12,17 +12,29 @@ const HomePage = () => {
   const [latestTemp, setLatestTemp] = useState("");
   const [latestHum, setLatestHum] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const loadLatestData = async () => {
       try {
         const data_hum = await fetchLatestHumidityData();
-        setLatestHum(data_hum);
-
+        if (data_hum === null) {
+          console.log("No data available for humidity");
+          setLatestHum({data:"N/A"});
+        }
+        else {
+          setLatestHum(data_hum);
+        }
         const data_temp = await fetchLatestTemperatureData();
-        setLatestTemp(data_temp);
+        if (data_temp === null) {
+          console.log("No data available for temperature");
+          setLatestTemp({data:"N/A"});
+        }
+        else {
+          setLatestTemp(data_temp);
+        }
       } catch (error) {
-        throw error;
+        setError(error);
       } finally {
         setLoading(false);
       }
@@ -32,7 +44,7 @@ const HomePage = () => {
   }, []);
 
   if (loading) return <Spinner />;
-
+  if (error) return <div>Error: {error.message}</div>;
   return (
     <div className="home-container">
       {/* Sidebar */}
@@ -41,7 +53,7 @@ const HomePage = () => {
 
           <li>
                                 <Link to="/home">
-                                  <FontAwesomeIcon icon={faTachometerAlt} /> HomePage
+                                  <FontAwesomeIcon icon={faHome} /> HomePage
                                 </Link>
           </li>
           <li>

@@ -13,9 +13,16 @@ export const fetchhumidityData = async () => {
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok)
-      console.log("Fetching humidities ",response.status);
-    return response.json();
+    if (response.ok) {
+      console.log("Response is okay! fetching humidityData latest");
+      return response.json();
+    } 
+    if (response.status === 204) {
+     console.log("No content available");
+     return null;
+
+  }else throw Error("Response is not ok while fetching TempData");
+
   } catch (err) {
     console.error("Could not connect to API ", err);
     throw err;
@@ -31,10 +38,22 @@ export const fetchLatestHumidityData = async () => {
         "Content-Type": "application/json",
       },
     });
-    if (!response.ok)
+    if (response.ok)
+    {
       console.log("Response latest hum status ", response.status);
-    return response.json();
-  } catch (err) {
+      return response.json();
+    }
+    if(response.status === 404) {
+      console.log("No value available");
+      return null;
+    }
+    
+    else{
+      console.log("Response latest hum status ", response.status);
+       throw Error("Response is not ok while fetching humidityData latest");
+    }
+    } 
+  catch (err) {
     throw err;
   }
 };

@@ -30,27 +30,44 @@ const DroneEvolution = () => {
   const [timestamps, setTimestamps] = useState([]);
   const [altitude, setAltitude] = useState([]);
   const [latitude_longitude, setLatitude_longitude] = useState([]);
-
+  const [error, setError] = useState(null);
   useEffect(() => {
     const loadData = async () => {
       try {
         const humidityData = await fetchhumidityData();
         const tempData = await fetchTempData();
+        
+        if (humidityData === null || tempData === null) {
+          console.log("No data available for humidity or temperature");
+          setHumidities([]);
+          setTemperatures([]);
+          setTimestamps([]);
+          setAltitude([]);
+          setLatitude_longitude([]);
+          setLoading(false);
+        }else
+        {
 
         const humidityValues = humidityData.map((d) => d.data);
         const tempValues = tempData.map((d) => d.data);
-        const timeLabels = humidityData.map((d) => d.date_registrationDate); // assuming both datasets have the same timestamps
+        const timeLabels = humidityData.map((d) =>
+          new Date(d.date_registrationDate).toISOString().split("T")[0]
+        );
         const altitudeValues = humidityData.map((d) => d.altitude);
         const latLonValues = humidityData.map((d) => d.geographicalZone);
-
-        setHumidities(humidityValues);
-        setTemperatures(tempValues);
-        setTimestamps(timeLabels);
-        setAltitude(altitudeValues);
-        setLatitude_longitude(latLonValues);
+    
+        const sliceLast = (arr) => arr.slice(-8);
+    
+        setHumidities(sliceLast(humidityValues));
+        setTemperatures(sliceLast(tempValues));
+        setTimestamps(sliceLast(timeLabels));
+        setAltitude(sliceLast(altitudeValues));
+        setLatitude_longitude(sliceLast(latLonValues));
         setLoading(false);
+      }
       } catch (err) {
         console.error(err);
+        setError(err);
         setLoading(false);
       }
     };
@@ -63,7 +80,7 @@ const DroneEvolution = () => {
   }, []);
 
   if (loading) return <div>Loading...</div>;
-
+  if (error) return <div>Error: {error.message}</div>;
   // Data for the chart
   const data = {
     labels: timestamps, // Time stamps for the X-axis
