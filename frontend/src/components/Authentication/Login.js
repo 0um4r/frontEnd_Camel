@@ -90,21 +90,6 @@ function Login({ onSwitch }) {
           Se connecter
         </button>
       </form>
-      <p style={{ marginTop: "20px" }}>
-        Pas encore de compte ?{" "}
-        <button
-          onClick={onSwitch}
-          style={{
-            border: "none",
-            background: "none",
-            color: "#007bff",
-            cursor: "pointer",
-            textDecoration: "underline",
-          }}
-        >
-          S'inscrire
-        </button>
-      </p>
     </div>
   );
 }

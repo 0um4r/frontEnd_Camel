@@ -46,13 +46,13 @@ const Dashboard = () => {
         const humidityTimestamps = humidityData.map(
           (d) => d.date_registrationDate
         );
-        const humidityLocs = humidityData.map((d) => d.location);
+        const humidityLocs = humidityData.map((d) => d.geographicalZone);
 
         const temperatureValues = temperatureData.map((d) => d.data);
         const temperatureTimestamps = temperatureData.map(
           (d) => d.date_registrationDate
         );
-        const temperatureLocs = temperatureData.map((d) => d.location);
+        const temperatureLocs = temperatureData.map((d) => d.geographicalZone);
 
         setHumidities(humidityValues);
         setTimestamps(humidityTimestamps);

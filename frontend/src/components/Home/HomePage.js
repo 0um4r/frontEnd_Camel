@@ -1,7 +1,7 @@
 import { React, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faUser, faCog, faChartLine, faServer,faHome } from '@fortawesome/free-solid-svg-icons';
+import { faTachometerAlt, faUser, faCog, faChartLine, faServer,faHome ,faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
 import "./HomePage.css";
 import { Spinner } from "../effects/LoadingSpinner";
 import { fetchLatestHumidityData } from "../../services/HumidityService"; 
@@ -80,6 +80,11 @@ const HomePage = () => {
           <li>
             <Link to="/server">
               <FontAwesomeIcon icon={faServer} /> Serveur
+            </Link>
+          </li>
+          <li>
+            <Link to="/map-drone">
+              <FontAwesomeIcon icon={faMapMarkerAlt} /> Carte Drone
             </Link>
           </li>
         </ul>

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Authentication/Login";
+import MapDrone from "./components/Map/MapDrone";
 import HomePage from "./components/Home/HomePage";
 import Settings from "./components/Seuil_Adjustment/Settings";
 import Alerts from "./components/Dashboards/temperature/Alerts/Alerts";
@@ -43,6 +44,9 @@ function App() {
 
           {/* Route pour les serveurs */}
           <Route path="/server" element={<Serveurs />} />
+
+          {/* Route pour Carte map */}
+          <Route path="/map-drone" element={<MapDrone />} />
 
           {/* Route pour la page Login/Signup */}
           <Route
