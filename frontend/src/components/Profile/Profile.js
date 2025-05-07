@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faKey, faSignOutAlt, faTachometerAlt, faUser, faCog, faBell, faChartLine, faServer, faUserPlus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faKey, faSignOutAlt, faMapMarkerAlt, faUser, faCog,  faServer, faUserPlus, faHome } from '@fortawesome/free-solid-svg-icons';
 import "./Profile.css";
 import handleCreateUserClick from "../UserManagement/CreateUser";
 import Cookies from "js-cookie";
-import {logoutUser} from "../../services/userServices";
+import {logoutUser, updateUser} from "../../services/userServices";
 const Profile = () => {
   const navigate = useNavigate();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -14,9 +15,9 @@ const Profile = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleChangePassword = (e) => {
+  const handleChangePassword = async (e) => {
     e.preventDefault();
-
+ 
     // Validation des champs
     if (!currentPassword || !newPassword || !confirmPassword) {
       setError("Tous les champs sont obligatoires.");
@@ -28,25 +29,41 @@ const Profile = () => {
       return;
     }
 
-    // Simuler une requête API pour changer le mot de passe
-    setError("");
-    setSuccess("Mot de passe changé avec succès !");
-    setTimeout(() => {
-      setSuccess("");
-    }, 3000);
+    const newVersion = {
+      firstName:null,
+      lastName:null,
+      email:null,
+      password: newPassword
+    };
+    // Appel à l'API pour changer le mot de passe
+    const token = Cookies.get("token");
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.ID; // Assurez-vous que le token contient l'ID de l'utilisateur
 
-    // Réinitialiser les champs
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-  };
+    const response = await updateUser(userId, newVersion);
+    if (response!==406) {
+    setSuccess("Mot de passe changé avec succès.");
+     handleLogout(); // Déconnexion après le changement de mot de passe
+   }
+   
+    else {
+      setError("Erreur lors du changement de mot de passe.");
+    }
+};
+
+
+
+const handleCreation = () => {
+  navigate("/create-user"); // Rediriger vers la page de création d'utilisateur
+
+}
 
   const handleLogout = async () => {
     // Simuler une déconne
-  
-  
-    Cookies.remove("token");
-     // Supprimer le token d'authentification
+    const token = Cookies.get("token");
+    const decodedToken = jwtDecode(token);
+    const userId = decodedToken.ID; // Assurez-vous que le token contient l'ID de l'utilisateur
+    await logoutUser(userId);
     navigate("/"); // Rediriger vers la page de connexion
   };
 
@@ -60,11 +77,7 @@ const Profile = () => {
               <FontAwesomeIcon icon={faHome} /> HomePage
             </Link>
           </li>
-          <li>
-            <Link to="/dashboard">
-              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
-            </Link>
-          </li>
+         
           <li>
             <Link to="/profile">
               <FontAwesomeIcon icon={faUser} /> Profil
@@ -75,16 +88,17 @@ const Profile = () => {
               <FontAwesomeIcon icon={faCog} /> Paramètres
             </Link>
           </li>
-          <li>
-            <Link to="/predictions">
-              <FontAwesomeIcon icon={faChartLine} /> Prédictions
-            </Link>
-          </li>
+        
           <li>
             <Link to="/server">
               <FontAwesomeIcon icon={faServer} /> Serveur
             </Link>
           </li>
+           <li>
+                      <Link to="/map-drone">
+                        <FontAwesomeIcon icon={faMapMarkerAlt} /> Carte Drone
+                      </Link>
+                    </li>
         </ul>
       </div>
 
@@ -142,7 +156,7 @@ const Profile = () => {
         </button>
          {/* Bouton "Créer un Utilisateur" */}
          
-         <button onClick={handleCreateUserClick} className="create-user-button">
+         <button onClick={handleCreation} className="create-user-button">
             <FontAwesomeIcon icon={faUserPlus} /> Créer un Utilisateur
             </button>
       </div>

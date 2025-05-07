@@ -7,10 +7,8 @@ import {
   faThermometerHalf,// Icône de température
   faTint,           // Icône d'humidité
   faSave,           // Icône de sauvegarde
-  faTachometerAlt,  // Icône du tableau de bord
   faUser,           // Icône du profil
-  faBell,           // Icône des alertes
-  faChartLine,      // Icône des prédictions
+  faMapMarkerAlt,
   faServer,          // Icône du serveur
   faHome
 } from '@fortawesome/free-solid-svg-icons';
@@ -41,7 +39,7 @@ const Settings = () => {
     };
 
     try{
-    const response = await setSeuil(seuilSequence);
+    await setSeuil(seuilSequence);
     console.log("Threshold sequence switched");
     navigate("/home")
   }catch(err)
@@ -61,11 +59,7 @@ const Settings = () => {
               <FontAwesomeIcon icon={faHome} /> HomePage
             </Link>
           </li>
-          <li>
-            <Link to="/dashboard">
-              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
-            </Link>
-          </li>
+        
           <li>
             <Link to="/profile">
               <FontAwesomeIcon icon={faUser} /> Profil
@@ -77,16 +71,17 @@ const Settings = () => {
             </Link>
           </li>
           
-          <li>
-            <Link to="/predictions">
-              <FontAwesomeIcon icon={faChartLine} /> Prédictions
-            </Link>
-          </li>
+         
           <li>
             <Link to="/server">
               <FontAwesomeIcon icon={faServer} /> Serveur
             </Link>
           </li>
+           <li>
+                <Link to="/map-drone">
+                  <FontAwesomeIcon icon={faMapMarkerAlt} /> Carte Drone
+                </Link>
+           </li>
         </ul>
       </div>
 

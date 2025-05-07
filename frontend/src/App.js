@@ -3,18 +3,13 @@ import Login from "./components/Authentication/Login";
 import MapDrone from "./components/Map/MapDrone";
 import HomePage from "./components/Home/HomePage";
 import Settings from "./components/Seuil_Adjustment/Settings";
-import Alerts from "./components/Dashboards/temperature/Alerts/Alerts";
-import PredictionsPage from "./components/Forecast/PredictionsPage";
-import Dashboard from "./components/Dashboards/temperature/humidity/Dashboard";
 import Profile from "./components/Profile/Profile";
 import BrokerSettings from "./components/BrokersSettings/BrokerSettings"; // Chemin correct
 import Serveurs from "./components/Serveurs/Serveurs"; // Assurez-vous que le chemin est correct
-import { BrokerProvider } from "./components/BrokersSettings/BrokerContext"; // Import du contexte
 import CreateUser from "./components/UserManagement/CreateUser"; // Import de la nouvelle page
 
 function App() {
   return (
-    <BrokerProvider> {/* Enveloppez tout avec BrokerProvider */}
       <Router>
         <Routes>
           {/* Route pour la page d'accueil */}
@@ -29,14 +24,7 @@ function App() {
           {/* Route pour la page de création d'utilisateur */}
           <Route path="/create-user" element={<CreateUser />} />
 
-          {/* Route pour les Alerts */}
-          <Route path="/Alerts" element={<Alerts />} />
-
-          {/* Route pour la page des prédictions */}
-          <Route path="/predictions" element={<PredictionsPage />} />
-
-          {/* Route pour le tableau de bord */}
-          <Route path="/dashboard" element={<Dashboard />} />
+        
 
           {/* Route pour les paramètres des brokers */}
           <Route path="/broker-settings" element={<BrokerSettings />} />
@@ -54,7 +42,6 @@ function App() {
             element={<Login/>}/>
         </Routes>
       </Router>
-    </BrokerProvider>
   );
 }
 

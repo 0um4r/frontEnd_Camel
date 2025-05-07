@@ -49,12 +49,12 @@ export const fetchLatestHumidityData = async () => {
     }
     
     else{
-      console.log("Response latest hum status ", response.status);
-       throw Error("Response is not ok while fetching humidityData latest");
+       console.log("Response latest hum status ", response.status);
     }
     } 
   catch (err) {
-    throw err;
+    throw Error("Response is not ok while fetching humidityData latest");
+
   }
 };
 

@@ -1,16 +1,16 @@
-import { React, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faUser, faCog, faChartLine, faServer,faHome ,faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faCog, faServer, faHome, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
 import "./HomePage.css";
 import { Spinner } from "../effects/LoadingSpinner";
-import { fetchLatestHumidityData } from "../../services/HumidityService"; 
+import { fetchLatestHumidityData } from "../../services/HumidityService";
 import { fetchLatestTemperatureData } from "../../services/TempDataService";
 import DroneEvolution from "../Dashboards/droneEvolution";
 
 const HomePage = () => {
-  const [latestTemp, setLatestTemp] = useState("");
-  const [latestHum, setLatestHum] = useState("");
+  const [latestTemp, setLatestTemp] = useState(null);
+  const [latestHum, setLatestHum] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -18,47 +18,34 @@ const HomePage = () => {
     const loadLatestData = async () => {
       try {
         const data_hum = await fetchLatestHumidityData();
-        if (data_hum === null) {
-          console.log("No data available for humidity");
-          setLatestHum({data:"N/A"});
-        }
-        else {
-          setLatestHum(data_hum);
-        }
+        setLatestHum(data_hum || { data: "N/A" });
+
         const data_temp = await fetchLatestTemperatureData();
-        if (data_temp === null) {
-          console.log("No data available for temperature");
-          setLatestTemp({data:"N/A"});
-        }
-        else {
-          setLatestTemp(data_temp);
-        }
+        setLatestTemp(data_temp || { data: "N/A" });
       } catch (error) {
         setError(error);
       } finally {
         setLoading(false);
       }
     };
-
-    loadLatestData();
-  }, []);
+//Create a interval of 2 sconds to fetch the data
+    const interval = setInterval(() => {
+      loadLatestData();
+    }, 2000);
+    return () => clearInterval(interval); // Cleanup interval on unmount
+  }, [])
 
   if (loading) return <Spinner />;
   if (error) return <div>Error: {error.message}</div>;
+
   return (
     <div className="home-container">
       {/* Sidebar */}
       <div className="sidebar">
         <ul>
-
           <li>
-                                <Link to="/home">
-                                  <FontAwesomeIcon icon={faHome} /> HomePage
-                                </Link>
-          </li>
-          <li>
-            <Link to="/dashboard">
-              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
+            <Link to="/home">
+              <FontAwesomeIcon icon={faHome} /> HomePage
             </Link>
           </li>
           <li>
@@ -69,12 +56,6 @@ const HomePage = () => {
           <li>
             <Link to="/settings">
               <FontAwesomeIcon icon={faCog} /> Paramètres
-            </Link>
-          </li>
-          
-          <li>
-            <Link to="/predictions">
-              <FontAwesomeIcon icon={faChartLine} /> Prédictions
             </Link>
           </li>
           <li>
@@ -94,19 +75,16 @@ const HomePage = () => {
       <div className="main-content">
         <header className="header">
           <h1>Bienvenue sur le Système de Surveillance Environnementale 🌍</h1>
-          <p>
-            Protégeons l'environnement avec des données précises et en temps réel.
-          </p>
         </header>
 
         <div className="summary-section">
           <div className="summary-card">
             <h3>Température</h3>
-            <p>🌡{latestTemp.data}C°</p>
+            <p>🌡 {latestTemp?.data ?? "N/A"}°C</p>
           </div>
           <div className="summary-card">
             <h3>Humidité</h3>
-            <p>💧 {latestHum.data}%</p>
+            <p>💧 {latestHum?.data ?? "N/A"}%</p>
           </div>
         </div>
 

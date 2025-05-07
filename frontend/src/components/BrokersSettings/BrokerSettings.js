@@ -1,40 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faServer,
   faPlus,
   faCheck,
-  faTachometerAlt,
   faUser,
   faCog,
-  faBell,
-  faChartLine,
-  faEnvelopeOpenText
+  faEnvelopeOpenText,
+  faHome,
+  faMapMarkerAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import "./BrokerSettings.css";
 import { fetchBrokers, cb } from "../../services/brokerService";
 import { Spinner } from "../effects/LoadingSpinner";
-import Subscribe from "./Subscribe"
+import Subscribe from "./Subscribe";
 
 const BrokerSettings = () => {
   const [showAddBrokerForm, setShowAddBrokerForm] = useState(false);
-  const [showSubscribeForm, setShowSubscribeForm] = useState(false); // 👈 New state
+  const [showSubscribeForm, setShowSubscribeForm] = useState(false);
   const [ip, setIp] = useState("");
   const [port, setPort] = useState("");
   const [brokers, setBrokers] = useState([]);
+  const [selectedBroker, setSelectedBroker] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const handleAddBrokerClick = () => {
     setShowAddBrokerForm(true);
   };
 
   const handleSubscribeClick = () => {
-    setShowSubscribeForm(true); // 👈 Open the subscribe form
+    setShowSubscribeForm(true);
   };
 
   const handleCloseSubscribe = () => {
-    setShowSubscribeForm(false); // 👈 Close the subscribe form
+    setShowSubscribeForm(false);
+  };
+
+  const handleCancelAddBroker = () => {
+    setShowAddBrokerForm(false);
   };
 
   useEffect(() => {
@@ -58,8 +63,51 @@ const BrokerSettings = () => {
     try {
       const response = await cb(ip, port);
       console.log("Changed the broker", response);
+      if (response === 0) {
+        alert("Le broker sélectionné n'est pas disponible.");
+        return;
+      }
+      if (response === 1) {
+      alert("Changé avec succès");
+      navigate("/home");
+      }
     } catch (err) {
       console.error("Failed to change broker", err);
+    }
+  };
+
+  const handleSelectBroker = async () => {
+    if (!selectedBroker) {
+      alert("Veuillez sélectionner un broker.");
+      return;
+    }
+
+    const [selectedIp, selectedPort] = selectedBroker.split(":");
+
+    try {
+      const response = await cb(selectedIp, selectedPort);
+      if(response===1)
+      {
+      console.log("Broker sélectionné avec succès :", response);
+      alert("Broker changé avec succès !");
+      navigate("/home");  
+      }
+      else if (response===0)
+      {
+        alert("Le broker sélectionné n'est pas disponible.");
+        return;
+      }
+      else
+      {
+        alert("Erreur lors du changement de broker.");
+        return
+      }
+
+    
+
+    } catch (err) {
+      console.error("Échec du changement de broker", err);
+      alert("Échec du changement de broker.");
     }
   };
 
@@ -67,12 +115,11 @@ const BrokerSettings = () => {
 
   return (
     <div className="broker-settings-page">
-      {/* Sidebar */}
       <div className="sidebar">
         <ul>
           <li>
-            <Link to="/dashboard">
-              <FontAwesomeIcon icon={faTachometerAlt} /> Tableau de bord
+            <Link to="/home">
+              <FontAwesomeIcon icon={faHome} /> HomePage
             </Link>
           </li>
           <li>
@@ -86,42 +133,43 @@ const BrokerSettings = () => {
             </Link>
           </li>
           <li>
-            <Link to="/alerts">
-              <FontAwesomeIcon icon={faBell} /> Alertes
-            </Link>
-          </li>
-          <li>
-            <Link to="/predictions">
-              <FontAwesomeIcon icon={faChartLine} /> Prédictions
-            </Link>
-          </li>
-          <li>
             <Link to="/server">
               <FontAwesomeIcon icon={faServer} /> Serveur
+            </Link>
+          </li>
+          <li>
+            <Link to="/map-drone">
+              <FontAwesomeIcon icon={faMapMarkerAlt} /> Carte Drone
             </Link>
           </li>
         </ul>
       </div>
 
-      {/* Contenu principal */}
       <div className="broker-settings-container">
         <h1>
           <FontAwesomeIcon icon={faServer} /> Paramètres du Broker
         </h1>
 
         <div className="broker-settings-content">
-          {/* Partie gauche : Sélection de broker */}
           <div className="broker-selection">
             <h2>Sélectionner un Broker</h2>
-            <select>
+            <select
+              value={selectedBroker}
+              onChange={(e) => setSelectedBroker(e.target.value)}
+            >
+              <option value="">-- Sélectionner un broker --</option>
               {brokers.map((broker) => (
-                <option key={broker.id} value={broker.ip + ":" + broker.port}>
-                  {broker.ip}
+                <option
+                  key={broker.id}
+                  value={`${broker.ip}:${broker.port}`}
+                >
+                  {broker.ip}:{broker.port}
                 </option>
               ))}
             </select>
+
             <div className="broker-buttons">
-              <button className="select-button">
+              <button className="select-button" onClick={handleSelectBroker}>
                 <FontAwesomeIcon icon={faCheck} /> Sélectionner
               </button>
               <button className="add-button" onClick={handleAddBrokerClick}>
@@ -133,7 +181,6 @@ const BrokerSettings = () => {
             </div>
           </div>
 
-          {/* Partie droite : Ajout de broker (affichée conditionnellement) */}
           {showAddBrokerForm && (
             <div className="add-broker-form">
               <h2>Ajouter un nouveau Broker</h2>
@@ -156,14 +203,22 @@ const BrokerSettings = () => {
                     required
                   />
                 </div>
-                <button type="submit" className="add-button">
-                  <FontAwesomeIcon icon={faPlus} /> Ajouter
-                </button>
+                <div className="form-buttons">
+                  <button type="submit" className="add-button">
+                    <FontAwesomeIcon icon={faPlus} /> Ajouter
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-button"
+                    onClick={handleCancelAddBroker}
+                  >
+                    Annuler
+                  </button>
+                </div>
               </form>
             </div>
           )}
 
-          {/* 🎯 Subscribe popup form */}
           {showSubscribeForm && <Subscribe onClose={handleCloseSubscribe} />}
         </div>
       </div>

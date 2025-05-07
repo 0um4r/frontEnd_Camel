@@ -44,10 +44,18 @@ const CreateUser = () => {
 
         try {
           const response = await createUser(user);
-          if(response.ok){
-            setSuccess("Success");
-        }
-          console.log("User created successfully , ",response);
+          if(response === 1) {
+            setSuccess("Utilisateur créé avec succès !");
+            setError("");
+            navigate("/profile"); // Rediriger vers la page de profil après la création
+          }else if (response=== 0){
+            setError("L'utilisateur existe déjà!");
+            setSuccess("");
+          }
+          else {
+            setError("Erreur lors de la création de l'utilisateur.");
+            setSuccess("");
+          }
         } catch (err) {
           console.log("USER:", user);
           console.error(err);
@@ -160,6 +168,7 @@ const CreateUser = () => {
               onChange={(e) => setRole(e.target.value)}
               required
             >
+              <option value="" disabled>Sélectionner un rôle</option>
               <option value="user">Utilisateur</option>
               <option value="admin">Administrateur</option>
             </select>

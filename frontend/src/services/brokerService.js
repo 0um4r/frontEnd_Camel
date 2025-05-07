@@ -15,10 +15,18 @@ export const fetchBrokers = async() =>
             "Content-Type": "application/json",
           },
         });
-        if (!response.ok) 
-          console.error("Response isn't okay while fetching Brokers");
-    
-        return await response.json();
+        if (response.ok)
+          { 
+            console.log("Fetched successfully!");
+            return response.json();
+          }
+          if(response.status===204)
+          {
+            return null;
+          }
+          else{
+            throw new Error(`Error while fetching brokers. status is ${response.status}`);
+          }
       } catch (err) {
         console.error("Could not connect to the API");
         throw err;
@@ -76,19 +84,24 @@ export const addTopic = async (topic) => {
 export const cb = async (ip, port) => {
   try {
     const response = await fetch(`${BASE_URL}/cb?ip=${ip}&port=${port}`, {
-      method: "POST", // ⬅️ must be POST
+      method: "POST", 
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
 
-    if (!response.ok) {
-      console.error("Response isn't okay while changing the Broker");
-      return null;
+    if (response.ok) {
+      console.log("Response ok while changing the Broker");
+      return 1;
     }
 
-    return await response.text(); // or `response.json()` if your backend returns JSON
+    if(!response.ok)
+    {
+      console.error("Response isn't okay while changing the Broker");
+      return 0;
+    }
+
   } catch (err) {
     console.error("Could not connect to the API");
   }

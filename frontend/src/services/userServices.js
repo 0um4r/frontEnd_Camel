@@ -95,9 +95,19 @@ export const updateUser = async (id, newVersion) => {
       body: JSON.stringify(newVersion),
     });
 
-    if (!response.ok) throw Error("Response is not ok while updating user");
-
-    return response.json();
+    if (response.ok) {
+      console.log("User updated successfully");
+      return response.status;
+    }
+    if (response.status === 406) {
+      console.log("User cannot be updated");
+      return response.status;
+    }
+    else
+    {
+      console.log("User not updated");
+      throw new Error(response.status);
+    }
   } catch (err) {
     console.error("Could not connect to API", err);
     throw err;
@@ -109,17 +119,24 @@ export const createUser = async (User) =>
 {
 
   try {
-    const response = await fetch(`${BASE_URL}/users/create`, {
+    const response = await fetch(`${BASE_URL}/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
       },
       body: JSON.stringify(User),
     });
-    if (!response.ok) {
-      throw new Error("Response isn't okay");
+    
+    if(response.ok){
+      return 1;
     }
-    return await response.json();
+    if (response.status === 406) {
+      return 0;
+    }
+    else {
+      return -1;
+    }
   } catch (err) {
     console.error("Error could not connect to API", err);
     throw err;
@@ -147,18 +164,29 @@ export const deletUser = async (id) => {
 
   export const logoutUser = async (id) => {
     try {
-      const response = await fetch(`${BASE_URL}/users/disconnect/${id}`, {
+      const response = await fetch(`${BASE_URL}/disconnect/${id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header
           "Content-Type": "application/json",
         },
     })
-    if (!response.ok) throw Error("Response is not ok while Logging out user");
+    if (response.ok)
+    {
+      Cookies.remove("token");
+    }
+    else if(response.status === 406)
+    {
+      console.log("User already disconnected");
+    }
+    else
+    {
+      throw Error(response.status);
+    }
 }
-catch (err) {
-    console.error("Could not connect to API", err);
-    throw err;
-  }
-}
+    catch (err) {
+      console.error("Could not connect to API", err);
+      throw err;
+    }
+  };
   

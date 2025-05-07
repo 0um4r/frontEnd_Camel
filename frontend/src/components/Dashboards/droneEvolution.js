@@ -51,7 +51,7 @@ const DroneEvolution = () => {
         const humidityValues = humidityData.map((d) => d.data);
         const tempValues = tempData.map((d) => d.data);
         const timeLabels = humidityData.map((d) =>
-          new Date(d.date_registrationDate).toISOString().split("T")[0]
+          new Date(d.date_registrationDate).toISOString().split("T")[1]
         );
         const altitudeValues = humidityData.map((d) => d.altitude);
         const latLonValues = humidityData.map((d) => d.geographicalZone);
@@ -128,8 +128,7 @@ const DroneEvolution = () => {
       },
     },
     animation: {
-      duration: 1000, // Animate over 1 second
-      easing: "easeInOutQuart", // Easing function for smooth animation
+      duration: 500, // Animate over 1 second
     },
   };
 
