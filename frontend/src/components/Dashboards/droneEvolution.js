@@ -13,6 +13,42 @@ import {
 import { fetchhumidityData } from "../../services/HumidityService";
 import { fetchTempData } from "../../services/TempDataService";
 
+// Plugin personnalisé pour afficher les flèches
+const arrowPlugin = {
+  id: "arrowPlugin",
+  afterDatasetDraw(chart, args, pluginOptions) {
+    const { ctx } = chart;
+    const dataset = args.meta.dataset;
+    const points = dataset.points;
+
+    ctx.save();
+    ctx.fillStyle = "#3e95cd";
+
+    for (let i = 1; i < points.length; i++) {
+      const p1 = points[i - 1];
+      const p2 = points[i];
+      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+      const arrowLength = 20;
+      const arrowWidth = 8;
+
+      ctx.beginPath();
+      ctx.moveTo(p2.x, p2.y);
+      ctx.lineTo(
+        p2.x - arrowLength * Math.cos(angle - Math.PI / 6),
+        p2.y - arrowLength * Math.sin(angle - Math.PI / 6)
+      );
+      ctx.lineTo(
+        p2.x - arrowLength * Math.cos(angle + Math.PI / 6),
+        p2.y - arrowLength * Math.sin(angle + Math.PI / 6)
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    ctx.restore();
+  },
+};
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,10 +56,11 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  arrowPlugin // Enregistrement du plugin
 );
 
-const MAX_DATA_POINTS = 20; // Limite à 20 points
+const MAX_DATA_POINTS = 20;
 
 const DroneEvolution = () => {
   const [loading, setLoading] = useState(true);
@@ -48,11 +85,11 @@ const DroneEvolution = () => {
         borderColor: "#3e95cd",
         backgroundColor: "#3e95cd",
         fill: false,
-        tension: 0.1, // Réduire la tension pour des courbes plus douces
+        tension: 0.1,
         pointRadius: 4,
         pointHoverRadius: 6,
         borderWidth: 2,
-        borderJoinStyle: 'round' // Pour des lignes plus lisses
+        borderJoinStyle: 'round'
       }
     ]
   });
@@ -63,7 +100,7 @@ const DroneEvolution = () => {
       const tempData = await fetchTempData();
 
       if (humidityData?.length > 0 && tempData?.length > 0) {
-        const labels = humidityData.map(item => 
+        const labels = humidityData.map(item =>
           new Date(item.date_registrationDate).toLocaleTimeString()
         );
         const altitudes = humidityData.map(item => item.altitude);
@@ -71,7 +108,6 @@ const DroneEvolution = () => {
         const temperatures = tempData.map(item => item.data);
         const locations = humidityData.map(item => item.geographicalZone);
 
-        // Garder seulement les 20 derniers points
         const slicedData = {
           labels: labels.slice(-MAX_DATA_POINTS),
           altitudes: altitudes.slice(-MAX_DATA_POINTS),
@@ -90,14 +126,13 @@ const DroneEvolution = () => {
     }
   };
 
-  // Animation progressive
   useEffect(() => {
     if (displayedData.altitudes.length === 0) return;
 
     const animationInterval = setInterval(() => {
       setCurrentIndex(prev => {
         const nextIndex = Math.min(prev + 1, displayedData.altitudes.length - 1);
-        
+
         setChartData({
           labels: displayedData.labels.slice(0, nextIndex + 1),
           datasets: [{
@@ -111,18 +146,16 @@ const DroneEvolution = () => {
         }
         return nextIndex;
       });
-    }, 1000); // Ajoute un point toutes les secondes
+    }, 1000);
 
     return () => clearInterval(animationInterval);
   }, [displayedData]);
 
   useEffect(() => {
     fetchData();
-    
     const refreshInterval = setInterval(() => {
       setLastUpdate(Date.now());
-    }, 5000); // Rafraîchissement des données toutes les 5 secondes
-
+    }, 5000);
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -144,7 +177,7 @@ const DroneEvolution = () => {
           }
         },
         ticks: {
-          callback: function(value) {
+          callback: function (value) {
             return value + "m";
           }
         }
@@ -174,7 +207,7 @@ const DroneEvolution = () => {
       },
       tooltip: {
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             const index = context.dataIndex;
             return [
               `Altitude: ${context.raw}m`,
@@ -198,7 +231,7 @@ const DroneEvolution = () => {
       }
     },
     animation: {
-      duration: 2000, // Animation plus longue
+      duration: 500,
       easing: "easeOutQuad"
     }
   };
@@ -209,10 +242,10 @@ const DroneEvolution = () => {
   return (
     <div className="drone-altitude-chart-container">
       <div className="chart-wrapper">
-        <Line 
+        <Line
           ref={chartRef}
-          data={chartData} 
-          options={options} 
+          data={chartData}
+          options={options}
           height={400}
           updateMode="active"
         />

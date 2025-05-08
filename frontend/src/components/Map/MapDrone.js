@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 import L from "leaflet";
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css';
+import 'leaflet-polylinedecorator';
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome,
@@ -57,6 +58,7 @@ const MapDrone = () => {
   const [inputValue, setInputValue] = useState("");
   const timerRef = useRef(null);
   const fetchIntervalRef = useRef(null);
+  const mapRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,10 +99,7 @@ const MapDrone = () => {
             clearInterval(timerRef.current);
             setIsSimulating(false);
             setShowPrompt(true);
-
-            // Supprimer la ligne après 1 seconde
             setTimeout(() => setPath([]), 1000);
-
             return prev;
           }
           const nextPosition = parsed[nextIndex];
@@ -118,10 +117,40 @@ const MapDrone = () => {
     clearInterval(timerRef.current);
     setIsSimulating(false);
     setShowPrompt(true);
-
-    // Supprimer la ligne après 1 seconde
     setTimeout(() => setPath([]), 1000);
   };
+
+  useEffect(() => {
+    if (!path || path.length < 2) return;
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (map._arrowDecorator) {
+      map.removeLayer(map._arrowDecorator);
+    }
+
+    const decorator = L.polylineDecorator(path, {
+      patterns: [
+        {
+          offset: '100%',
+          repeat: 0,
+          symbol: L.Symbol.arrowHead({
+            pixelSize: 20,
+            headAngle: 45,
+            pathOptions: {
+              stroke: true,
+              color: 'red',
+              weight: 4,
+              opacity: 0.9
+            }
+          })
+        }
+      ]
+    });
+
+    decorator.addTo(map);
+    map._arrowDecorator = decorator;
+  }, [path]);
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -137,6 +166,7 @@ const MapDrone = () => {
 
       <div style={{ flex: 1, position: "relative" }}>
         <MapContainer
+          ref={mapRef}
           center={position}
           zoom={13}
           scrollWheelZoom={true}
@@ -160,12 +190,10 @@ const MapDrone = () => {
             </Popup>
           </Marker>
 
-          {/* Ligne + marqueurs début/fin */}
           {path.length > 1 && (
             <>
               <Polyline positions={path} color="blue" />
 
-              {/* Départ */}
               <Marker position={path[0]} icon={L.icon({
                 iconUrl: "https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=D|00ff00|000000",
                 iconSize: [21, 34],
@@ -174,7 +202,6 @@ const MapDrone = () => {
                 <Popup>Départ</Popup>
               </Marker>
 
-              {/* Arrivée */}
               <Marker position={path[path.length - 1]} icon={L.icon({
                 iconUrl: "https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=A|ff0000|000000",
                 iconSize: [21, 34],
