@@ -99,7 +99,7 @@ const MapDrone = () => {
             clearInterval(timerRef.current);
             setIsSimulating(false);
             setShowPrompt(true);
-            setTimeout(() => setPath([]), 1000);
+            setTimeout(() => setPath([]), 5000);
             return prev;
           }
           const nextPosition = parsed[nextIndex];
@@ -117,7 +117,7 @@ const MapDrone = () => {
     clearInterval(timerRef.current);
     setIsSimulating(false);
     setShowPrompt(true);
-    setTimeout(() => setPath([]), 1000);
+    setTimeout(() => setPath([]), 5000);
   };
 
   useEffect(() => {
