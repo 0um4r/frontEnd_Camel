@@ -75,3 +75,28 @@ export const fetchhumidityDataById = async (id) => {
     throw err;
   }
 };
+
+
+  export const getHistory = async (limit) => {
+    try {
+      const response = await fetch(`${BASE_URL}/history?_limit=${limit}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+          console.error("history response is okay!");
+          return response.json();
+      }
+
+      if (response.status === 204) {
+        console.log("No content available");
+        return null;
+      }
+    } catch (err) {
+      console.error("Could not connect to API ", err);
+      throw err;
+    }       
+  }

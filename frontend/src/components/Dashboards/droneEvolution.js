@@ -10,248 +10,207 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { fetchhumidityData } from "../../services/HumidityService";
-import { fetchTempData } from "../../services/TempDataService";
+import { fetchLatestTemperatureData as fetchLatestTemp } from "../../services/TempDataService";
 
-// Plugin personnalisé pour afficher les flèches
+// Dessine les flèches
+const drawArrow = (ctx, fromX, fromY, toX, toY) => {
+  const headlen = 24;
+  const angle = Math.atan2(toY - fromY, toX - fromX);
+  ctx.beginPath();
+  ctx.moveTo(toX, toY);
+  ctx.lineTo(toX - headlen * Math.cos(angle - Math.PI / 6), toY - headlen * Math.sin(angle - Math.PI / 6));
+  ctx.lineTo(toX - headlen * Math.cos(angle + Math.PI / 6), toY - headlen * Math.sin(angle + Math.PI / 6));
+  ctx.closePath();
+  ctx.fillStyle = "#ff6384";
+  ctx.fill();
+};
+
 const arrowPlugin = {
   id: "arrowPlugin",
-  afterDatasetDraw(chart, args, pluginOptions) {
-    const { ctx } = chart;
-    const dataset = args.meta.dataset;
-    const points = dataset.points;
-
-    ctx.save();
-    ctx.fillStyle = "#3e95cd";
-
-    for (let i = 1; i < points.length; i++) {
-      const p1 = points[i - 1];
-      const p2 = points[i];
-      const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
-      const arrowLength = 20;
-      const arrowWidth = 8;
-
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const data = chart.data.datasets[0].data;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    for (let i = 0; i < data.length - 1; i++) {
+      if (data[i] == null || data[i + 1] == null) continue;
+      const x1 = xScale.getPixelForValue(i);
+      const y1 = yScale.getPixelForValue(data[i]);
+      const x2 = xScale.getPixelForValue(i + 1);
+      const y2 = yScale.getPixelForValue(data[i + 1]);
       ctx.beginPath();
-      ctx.moveTo(p2.x, p2.y);
-      ctx.lineTo(
-        p2.x - arrowLength * Math.cos(angle - Math.PI / 6),
-        p2.y - arrowLength * Math.sin(angle - Math.PI / 6)
-      );
-      ctx.lineTo(
-        p2.x - arrowLength * Math.cos(angle + Math.PI / 6),
-        p2.y - arrowLength * Math.sin(angle + Math.PI / 6)
-      );
-      ctx.closePath();
-      ctx.fill();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = "#ff6384";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      drawArrow(ctx, x1, y1, x2, y2);
     }
-
-    ctx.restore();
   },
 };
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  arrowPlugin // Enregistrement du plugin
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, arrowPlugin);
 
-const MAX_DATA_POINTS = 20;
+const DroneEvolution = ({ isSimulating = false, historyTempData = [], onSimulationEnd = () => {}, onProgress = () => {} }) => {
+  const [labels, setLabels] = useState([]);
+  const [temperatures, setTemperatures] = useState([]);
+  const [zones, setZones] = useState([]);
+  const [minTemp, setMinTemp] = useState(null);
+  const [maxTemp, setMaxTemp] = useState(null);
 
-const DroneEvolution = () => {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const chartRef = useRef(null);
-  const [lastUpdate, setLastUpdate] = useState(Date.now());
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [displayedData, setDisplayedData] = useState({
-    labels: [],
-    altitudes: [],
-    humidities: [],
-    temperatures: [],
-    locations: []
-  });
+  const simulationIntervalRef = useRef(null);
+  const realtimeIntervalRef = useRef(null);
+  const realtimeDataRef = useRef([]);
 
-  const [chartData, setChartData] = useState({
-    labels: [],
-    datasets: [
-      {
-        label: "Altitude (m)",
-        data: [],
-        borderColor: "#3e95cd",
-        backgroundColor: "#3e95cd",
-        fill: false,
-        tension: 0.1,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-        borderWidth: 2,
-        borderJoinStyle: 'round'
-      }
-    ]
-  });
-
-  const fetchData = async () => {
+  // Real-time logic
+  const fetchAndAppend = async () => {
     try {
-      const humidityData = await fetchhumidityData();
-      const tempData = await fetchTempData();
+      const latest = await fetchLatestTemp();
+      if (!latest) return;
 
-      if (humidityData?.length > 0 && tempData?.length > 0) {
-        const labels = humidityData.map(item =>
-          new Date(item.date_registrationDate).toLocaleTimeString()
-        );
-        const altitudes = humidityData.map(item => item.altitude);
-        const humidities = humidityData.map(item => item.data);
-        const temperatures = tempData.map(item => item.data);
-        const locations = humidityData.map(item => item.geographicalZone);
+      const lastId = realtimeDataRef.current.at(-1)?.id;
+      if (latest.id === lastId) return;
 
-        const slicedData = {
-          labels: labels.slice(-MAX_DATA_POINTS),
-          altitudes: altitudes.slice(-MAX_DATA_POINTS),
-          humidities: humidities.slice(-MAX_DATA_POINTS),
-          temperatures: temperatures.slice(-MAX_DATA_POINTS),
-          locations: locations.slice(-MAX_DATA_POINTS)
-        };
+      // Ajouter à la liste
+      realtimeDataRef.current.push(latest);
 
-        setDisplayedData(slicedData);
+      // Si on dépasse 10, on reset et recommence
+      if (realtimeDataRef.current.length > 10) {
+        realtimeDataRef.current = [latest];
       }
-      setLoading(false);
-    } catch (err) {
-      console.error("Erreur de chargement:", err);
-      setError(err);
-      setLoading(false);
+
+      const temps = realtimeDataRef.current.map(item => item.data);
+      const xLabels = realtimeDataRef.current.map(item => new Date(item.date_registrationDate).toLocaleTimeString());
+      const zoneLabels = realtimeDataRef.current.map(item => item.geographicalZone);
+
+      setTemperatures(temps);
+      setLabels(xLabels);
+      setZones(zoneLabels);
+      setMinTemp(Math.min(...temps));
+      setMaxTemp(Math.max(...temps));
+    } catch (error) {
+      console.error("Erreur dans fetchAndAppend:", error);
     }
   };
 
+  // Real-time activation
+ useEffect(() => {
+  if (!isSimulating) {
+    // Reset données pour mode réel
+    realtimeDataRef.current = [];
+    fetchAndAppend(); // Premier fetch immédiat
+    realtimeIntervalRef.current = setInterval(fetchAndAppend, 2000);
+  }
+
+  return () => clearInterval(realtimeIntervalRef.current);
+}, [isSimulating]);
+
+
+  // Simulation setup
   useEffect(() => {
-    if (displayedData.altitudes.length === 0) return;
+    if (isSimulating) {
+      const xLabels = historyTempData.map(item => new Date(item.date_registrationDate).toLocaleTimeString());
+      const zoneLabels = historyTempData.map(item => item.geographicalZone);
+      const temps = historyTempData.map(item => item.data);
 
-    const animationInterval = setInterval(() => {
-      setCurrentIndex(prev => {
-        const nextIndex = Math.min(prev + 1, displayedData.altitudes.length - 1);
+      setLabels(xLabels);
+      setZones(zoneLabels);
+      setTemperatures(Array(historyTempData.length).fill(null));
+      setMinTemp(Math.min(...temps));
+      setMaxTemp(Math.max(...temps));
+    }
+  }, [historyTempData, isSimulating]);
 
-        setChartData({
-          labels: displayedData.labels.slice(0, nextIndex + 1),
-          datasets: [{
-            ...chartData.datasets[0],
-            data: displayedData.altitudes.slice(0, nextIndex + 1)
-          }]
-        });
+  const startSimulation = () => {
+    let index = 0;
+    const buffer = Array(historyTempData.length).fill(null);
 
-        if (nextIndex >= displayedData.altitudes.length - 1) {
-          clearInterval(animationInterval);
-        }
-        return nextIndex;
-      });
-    }, 1000);
-
-    return () => clearInterval(animationInterval);
-  }, [displayedData]);
+    simulationIntervalRef.current = setInterval(() => {
+      if (index >= historyTempData.length) {
+        clearInterval(simulationIntervalRef.current);
+        onSimulationEnd();
+        setTemperatures([]);
+        return;
+      }
+      buffer[index] = historyTempData[index].data;
+      setTemperatures([...buffer]);
+      onProgress(index);
+      index++;
+    }, 2000);
+  };
 
   useEffect(() => {
-    fetchData();
-    const refreshInterval = setInterval(() => {
-      setLastUpdate(Date.now());
-    }, 5000);
-    return () => clearInterval(refreshInterval);
-  }, []);
+    if (isSimulating) {
+      startSimulation();
+    }
+    return () => clearInterval(simulationIntervalRef.current);
+  }, [isSimulating]);
 
-  useEffect(() => {
-    fetchData();
-  }, [lastUpdate]);
+  const chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Température (°C)",
+        data: temperatures,
+        borderColor: "#ff6384",
+        backgroundColor: "#ff6384",
+        tension: 0,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      },
+    ],
+  };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    animation:false,
     scales: {
       y: {
         beginAtZero: false,
+        suggestedMin: minTemp,
+        suggestedMax: maxTemp,
         title: {
           display: true,
-          text: "Altitude (mètres)",
-          font: {
-            weight: "bold"
-          }
+          text: "Température (°C)",
         },
-        ticks: {
-          callback: function (value) {
-            return value + "m";
-          }
-        }
       },
       x: {
         title: {
           display: true,
           text: "Heure de mesure",
-          font: {
-            weight: "bold"
-          }
         },
         ticks: {
           maxRotation: 45,
-          minRotation: 45
-        }
-      }
+          minRotation: 45,
+        },
+      },
     },
     plugins: {
       legend: {
+        display: true,
         position: "top",
-        labels: {
-          font: {
-            size: 14
-          }
-        }
+      },
+      title: {
+        display: true,
+        text: "Évolution de la température",
+        font: { size: 18 },
+        padding: { top: 10, bottom: 20 },
       },
       tooltip: {
         callbacks: {
           label: function (context) {
+            const value = context.parsed.y;
             const index = context.dataIndex;
-            return [
-              `Altitude: ${context.raw}m`,
-              `Température: ${displayedData.temperatures[index]}°C`,
-              `Humidité: ${displayedData.humidities[index]}%`,
-              `Position: ${displayedData.locations[index]}`
-            ];
-          }
-        }
-      },
-      title: {
-        display: true,
-        text: "Évolution de l'altitude du drone en temps réel",
-        font: {
-          size: 18
+            const zone = zones[index] || "Zone inconnue";
+            return `Temp: ${value}°C | Position: ${zone}`;
+          },
         },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      }
+      },
     },
-    animation: {
-      duration: 500,
-      easing: "easeOutQuad"
-    }
   };
 
-  if (loading) return <div className="loading-message">Chargement des données en cours...</div>;
-  if (error) return <div className="error-message">Erreur: {error.message}</div>;
-
-  return (
-    <div className="drone-altitude-chart-container">
-      <div className="chart-wrapper">
-        <Line
-          ref={chartRef}
-          data={chartData}
-          options={options}
-          height={400}
-          updateMode="active"
-        />
-      </div>
-    </div>
-  );
+  return <div style={{ height: 400 }}><Line data={chartData} options={options} /></div>;
 };
 
 export default DroneEvolution;
